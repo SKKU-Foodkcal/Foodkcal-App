@@ -41,6 +41,7 @@ public class Result extends AppCompatActivity {
     ImageView imageview;
     Button btn_cancel;
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
