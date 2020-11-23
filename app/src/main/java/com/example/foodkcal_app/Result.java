@@ -1,5 +1,6 @@
 package com.example.foodkcal_app;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
 
@@ -8,6 +9,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -21,6 +23,7 @@ import com.example.foodkcal_app.R;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -45,7 +48,9 @@ public class Result extends AppCompatActivity {
         context = getApplicationContext();
 
         imageview = findViewById(R.id.imageView);
+        Log.d(TAG, "onCreate: 111");
         dispatchTakePictureIntent();
+        Log.d(TAG, "onCreate: 222");
 
         btn_cancel = findViewById(R.id.btn_cancel);
         btn_cancel.setOnClickListener(new View.OnClickListener(){
@@ -56,6 +61,7 @@ public class Result extends AppCompatActivity {
         });
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     private void dispatchTakePictureIntent() {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         // Ensure that there's a camera activity to handle the intent
@@ -66,7 +72,9 @@ public class Result extends AppCompatActivity {
                 photoFile = createImageFile();
             } catch (IOException ex) {
                 // Error occurred while creating the File
-                //Log.d(TAG, "dispatchTakePictureIntent: ioexception error");
+                Log.d(TAG, "dispatchTakePictureIntent: ioexception error");
+                Log.d(TAG, "dispatchTakePictureIntent: " + ex.getMessage());
+                Log.d(TAG, "dispatchTakePictureIntent: " + ex.getCause());
             }
             // Continue only if the File was successfully created
             if (photoFile != null) {
@@ -79,21 +87,23 @@ public class Result extends AppCompatActivity {
         }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     private File createImageFile() throws IOException {
         // Create an image file name
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String timeStamp = new SimpleDateFormat("yyyyMMdd").format(new Date());
         String imageFileName = "JPEG_" + timeStamp + "_";
-        File storageDir = getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
-        //Log.d(TAG, "createImageFile: " + storageDir);
+        //File storageDir = getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+        File storageDir = context.getFilesDir();
+        Log.d(TAG, "createImageFile: " + storageDir);
         File image = File.createTempFile(
                 imageFileName,  /* prefix */
                 ".jpg",         /* suffix */
                 storageDir      /* directory */
         );
-
+        Log.d(TAG, "createImageFile: 111");
         // Save a file: path for use with ACTION_VIEW intents
         currentPhotoPath = image.getAbsolutePath();
-        //Log.d(TAG, "createImageFile: curphotopath : " + currentPhotoPath);
+        Log.d(TAG, "createImageFile: curphotopath : " + currentPhotoPath);
         return image;
     }
 
