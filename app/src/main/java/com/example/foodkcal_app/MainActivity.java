@@ -1,11 +1,16 @@
 package com.example.foodkcal_app;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.FileProvider;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -13,18 +18,22 @@ import android.widget.TextView;
 
 import com.example.foodkcal_app.R;
 
+import java.io.File;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
+import static android.os.Environment.getExternalStoragePublicDirectory;
+
 
 public class MainActivity extends AppCompatActivity {
 
-    private ImageView imageView=null;
     private Button CamButton;
     private Context context;
     private TextView text;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -34,7 +43,9 @@ public class MainActivity extends AppCompatActivity {
         CamButton = findViewById(R.id.button);
         CamButton.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v){
-                dispatchTakePictureIntent();
+                Intent intent=new Intent(MainActivity.this,Result.class);
+                startActivity(intent);
+
             }
         });
 
@@ -82,54 +93,6 @@ public class MainActivity extends AppCompatActivity {
         text.setText(date0);
 
 
-
-        /*
-        sendButton.setOnClickListener(new View.OnClickListener(){
-            public void onClick(View v){
-                if(imageView.getDrawable() == null){
-                    int duration = Toast.LENGTH_SHORT;
-                    Toast toast = Toast.makeText(context, "이미지를 넣어주세요", duration);
-                    toast.show();
-                }
-                else{
-                    int duration = Toast.LENGTH_SHORT;
-                    Toast toast = Toast.makeText(context, "서버로 전송합니다", duration);
-                    toast.show();
-                }
-                //send to server
-            }
-        });
-
-        camButton.setOnClickListener(new View.OnClickListener(){
-            public void onClick(View v){
-                dispatchTakePictureIntent();
-            }
-        });
-         */
-
     }
-
-    /*
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
-            Bundle extras = data.getExtras();
-            Bitmap imageBitmap = (Bitmap) extras.get("data");
-            imageView.setImageBitmap(imageBitmap);
-        }
-    } */
-
-
-
-    static final int REQUEST_IMAGE_CAPTURE = 1;
-
-    private void dispatchTakePictureIntent() {
-        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-            startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
-        }
-    }
-
 
 }
