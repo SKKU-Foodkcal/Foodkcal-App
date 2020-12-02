@@ -4,11 +4,13 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -29,6 +31,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
+import retrofit2.Call;
+
 import static android.os.Environment.getExternalStoragePublicDirectory;
 
 
@@ -40,6 +44,7 @@ public class Result extends AppCompatActivity {
     String currentPhotoPath;
     ImageView imageview;
     Button btn_cancel;
+    Button anaylze;
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
@@ -58,6 +63,34 @@ public class Result extends AppCompatActivity {
             @Override
             public void onClick(View view){
                 finish();
+            }
+        });
+
+        anaylze = findViewById(R.id.analyze);
+        anaylze.setOnClickListener(new View.OnClickListener() {
+            @SuppressLint("StaticFieldLeak")
+            @Override
+            public void onClick(View view) {
+                new AsyncTask<Void, Void, String>() {
+                    @Override
+                    protected String doInBackground(Void... params) {
+                        TestService testService = TestService.retrofit.create(TestService.class);
+                        Call<String> call = testService.getTest();
+
+                        try {
+                            return call.execute().body();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        return null;
+                    }
+                    @Override
+                    protected void onPostExecute(String s) {
+                        super.onPostExecute(s);
+                        TextView textView = (TextView) findViewById(R.id.foodName);
+                        textView.setText(s);
+                    }
+                }.execute();
             }
         });
     }
