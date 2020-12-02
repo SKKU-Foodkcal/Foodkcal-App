@@ -87,8 +87,12 @@ public class Result extends AppCompatActivity {
                 call.enqueue(new Callback<PostResponse>() {
                     @Override
                     public void onResponse(Call<PostResponse> call, Response<PostResponse> response) {
-                        Gson gson = new Gson();
-                        System.out.println(response.body().toString());
+                        String fat = response.body().getFat();
+                        String carbs = response.body().getCarbs();
+                        String foodName = response.body().getFood_Name();
+                        String unit = response.body().getUnit();
+                        String calories = response.body().getCalories();
+                        String protein = response.body().getProtein();
                     }
 
                     @Override

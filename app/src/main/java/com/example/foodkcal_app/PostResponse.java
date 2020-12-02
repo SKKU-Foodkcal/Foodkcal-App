@@ -13,7 +13,7 @@ public class PostResponse
     @Expose
     private String Carbs;
 
-    @SerializedName("FoodName")
+    @SerializedName("Food_Name")
     @Expose
     private String Food_Name;
 
