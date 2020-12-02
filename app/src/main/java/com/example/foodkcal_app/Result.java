@@ -3,17 +3,14 @@ package com.example.foodkcal_app;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
-
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
@@ -21,27 +18,16 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.example.foodkcal_app.R;
-import com.google.gson.Gson;
-
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.Locale;
-
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
-import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-
-import static android.os.Environment.getExternalStoragePublicDirectory;
-
 
 public class Result extends AppCompatActivity {
 
@@ -50,9 +36,10 @@ public class Result extends AppCompatActivity {
     static final int REQUEST_TAKE_PHOTO = 1;
     String currentPhotoPath;
     ImageView imageview;
-    Button btn_cancel;
     Button anaylze;
-    Gson mGson;
+    Button btn_cancel;
+    TextView foodName;
+    TextView kcalPerUnit;
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
@@ -89,10 +76,16 @@ public class Result extends AppCompatActivity {
                     public void onResponse(Call<PostResponse> call, Response<PostResponse> response) {
                         String fat = response.body().getFat();
                         String carbs = response.body().getCarbs();
-                        String foodName = response.body().getFood_Name();
+                        String food_Name = response.body().getFood_Name();
                         String unit = response.body().getUnit();
                         String calories = response.body().getCalories();
                         String protein = response.body().getProtein();
+
+                        foodName = findViewById(R.id.foodName);
+                        kcalPerUnit = findViewById(R.id.kcalPerUnit);
+
+                        foodName.setText(food_Name);
+                        kcalPerUnit.setText(calories + ' ' + unit);
                     }
 
                     @Override
