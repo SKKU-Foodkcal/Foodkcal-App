@@ -31,6 +31,9 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
 import retrofit2.Call;
 
 import static android.os.Environment.getExternalStoragePublicDirectory;
@@ -74,8 +77,13 @@ public class Result extends AppCompatActivity {
                 new AsyncTask<Void, Void, String>() {
                     @Override
                     protected String doInBackground(Void... params) {
+                        File file = new File(currentPhotoPath);
+                        MultipartBody.Part filePart = MultipartBody.Part.createFormData("images", file.getName(),
+                                RequestBody.create(MediaType.parse("image/*"), file));
+
+
                         TestService testService = TestService.retrofit.create(TestService.class);
-                        Call<Object> call = testService.getTest();
+                        Call<PostResponse> call = testService.postImage(filePart);
 
                         try {
                             return call.execute().body().toString();
@@ -84,6 +92,7 @@ public class Result extends AppCompatActivity {
                         }
                         return null;
                     }
+
                     @Override
                     protected void onPostExecute(String s) {
                         super.onPostExecute(s);
