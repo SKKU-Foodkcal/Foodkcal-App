@@ -1,17 +1,32 @@
 package com.example.foodkcal_app;
 
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
+
 public class PostResponse
 {
+    @SerializedName("Fat")
+    @Expose
     private String Fat;
 
+    @SerializedName("Carbs")
+    @Expose
     private String Carbs;
 
+    @SerializedName("FoodName")
+    @Expose
     private String Food_Name;
 
+    @SerializedName("Unit")
+    @Expose
     private String Unit;
 
+    @SerializedName("Calories")
+    @Expose
     private String Calories;
 
+    @SerializedName("Protein")
+    @Expose
     private String Protein;
 
     public String getFat ()

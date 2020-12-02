@@ -22,6 +22,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.foodkcal_app.R;
+import com.google.gson.Gson;
 
 import java.io.File;
 import java.io.IOException;
@@ -34,7 +35,10 @@ import java.util.Locale;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
 import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 import static android.os.Environment.getExternalStoragePublicDirectory;
 
@@ -48,6 +52,7 @@ public class Result extends AppCompatActivity {
     ImageView imageview;
     Button btn_cancel;
     Button anaylze;
+    Gson mGson;
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
@@ -74,6 +79,24 @@ public class Result extends AppCompatActivity {
             @SuppressLint("StaticFieldLeak")
             @Override
             public void onClick(View view) {
+                File file = new File(currentPhotoPath);
+                MultipartBody.Part filePart = MultipartBody.Part.createFormData("images", file.getName(),
+                        RequestBody.create(MediaType.parse("image/*"), file));
+                TestService testService = TestService.retrofit.create(TestService.class);
+                Call<PostResponse> call = testService.postImage(filePart);
+                call.enqueue(new Callback<PostResponse>() {
+                    @Override
+                    public void onResponse(Call<PostResponse> call, Response<PostResponse> response) {
+                        Gson gson = new Gson();
+                        System.out.println(response.body().toString());
+                    }
+
+                    @Override
+                    public void onFailure(Call<PostResponse> call, Throwable t) {
+                    }
+                });
+
+                /*
                 new AsyncTask<Void, Void, String>() {
                     @Override
                     protected String doInBackground(Void... params) {
@@ -100,6 +123,7 @@ public class Result extends AppCompatActivity {
                         textView.setText(s);
                     }
                 }.execute();
+                 */
             }
         });
     }
