@@ -75,10 +75,10 @@ public class Result extends AppCompatActivity {
                     @Override
                     protected String doInBackground(Void... params) {
                         TestService testService = TestService.retrofit.create(TestService.class);
-                        Call<String> call = testService.getTest();
+                        Call<Object> call = testService.getTest();
 
                         try {
-                            return call.execute().body();
+                            return call.execute().body().toString();
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
