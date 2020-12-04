@@ -115,11 +115,7 @@ public class MainActivity extends AppCompatActivity {
                 gd.setCornerRadius(5);
                 gd.setStroke(1, 0xFF000000);
                 entryLayout.setBackground(gd);
-                entryLayout.setOnClickListener(new View.OnClickListener(){
-                    public void onClick(View v){
-                        Toast.makeText(context, "clicked!!", Toast.LENGTH_SHORT).show();
-                    }
-                });
+
 
                 File file = new File(storageDir, "foodkcal_" + timeStamp + "_" + j + ".jpg");
                 BitmapFactory.Options op = new BitmapFactory.Options();
@@ -169,10 +165,17 @@ public class MainActivity extends AppCompatActivity {
                 }catch (FileNotFoundException e) {
                     // TODO: handle exception
                 }
+                final String tempstr = infoTextView.getText().toString();
                 // add the textview to the linearlayout
                 entryLayout.addView(infoTextView);
 
                 layout.addView(entryLayout);
+
+                entryLayout.setOnClickListener(new View.OnClickListener(){
+                    public void onClick(View v){
+                        Toast.makeText(context, tempstr, Toast.LENGTH_SHORT).show();
+                    }
+                });
 
             }
         }
