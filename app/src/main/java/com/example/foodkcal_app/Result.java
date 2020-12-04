@@ -106,35 +106,6 @@ public class Result extends AppCompatActivity {
                     public void onFailure(Call<PostResponse> call, Throwable t) {
                     }
                 });
-
-                /*
-                new AsyncTask<Void, Void, String>() {
-                    @Override
-                    protected String doInBackground(Void... params) {
-                        File file = new File(currentPhotoPath);
-                        MultipartBody.Part filePart = MultipartBody.Part.createFormData("images", file.getName(),
-                                RequestBody.create(MediaType.parse("image/*"), file));
-
-
-                        TestService testService = TestService.retrofit.create(TestService.class);
-                        Call<PostResponse> call = testService.postImage(filePart);
-
-                        try {
-                            return call.execute().body().toString();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                        return null;
-                    }
-
-                    @Override
-                    protected void onPostExecute(String s) {
-                        super.onPostExecute(s);
-                        TextView textView = (TextView) findViewById(R.id.foodName);
-                        textView.setText(s);
-                    }
-                }.execute();
-                 */
             }
         });
 

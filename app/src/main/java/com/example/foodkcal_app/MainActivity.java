@@ -35,7 +35,7 @@ import static android.os.Environment.getExternalStoragePublicDirectory;
 
 public class MainActivity extends AppCompatActivity {
 
-    private Button btn_cam, btn_load;
+    private Button btn_cam;
     private Context context;
     private File storageDir;
     private String timeStamp;
@@ -48,7 +48,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         context = getApplicationContext();
         btn_cam = findViewById(R.id.button);
-        btn_load = findViewById(R.id.button2);
         layout = findViewById(R.id.myll);
         sp = this.getSharedPreferences("MYSP", Context.MODE_MULTI_PROCESS | Context.MODE_PRIVATE);
         timeStamp = new SimpleDateFormat("yyyyMMdd").format(new Date());
@@ -62,62 +61,108 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        btn_load.setOnClickListener(new View.OnClickListener(){
-            public void onClick(View v){
-                layout.removeAllViews();
-                for(int i=0; i<7; i++){
-                    final Calendar cal = Calendar.getInstance();
-                    cal.add(Calendar.DATE, -i);
-                    Date d = cal.getTime();
-                    timeStamp = new SimpleDateFormat("yyyyMMdd").format(d);
+        layout.removeAllViews();
+        for(int i=0; i<7; i++){
+            final Calendar cal = Calendar.getInstance();
+            cal.add(Calendar.DATE, -i);
+            Date d = cal.getTime();
+            timeStamp = new SimpleDateFormat("yyyyMMdd").format(d);
 
-                    final TextView dayTextView = new TextView(context);
-                    dayTextView.append(timeStamp + "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-                    layout.addView(dayTextView);
+            final TextView dayTextView = new TextView(context);
+            dayTextView.append(timeStamp + "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+            layout.addView(dayTextView);
 
-                    int N = sp.getInt(timeStamp, 0);
+            int N = sp.getInt(timeStamp, 0);
 
-                    for (int j = 0; j < N; j++) {
+            for (int j = 0; j < N; j++) {
 
-                        final LinearLayout entryLayout = new LinearLayout(context);
-                        entryLayout.setOrientation(LinearLayout.HORIZONTAL);
+                final LinearLayout entryLayout = new LinearLayout(context);
+                entryLayout.setOrientation(LinearLayout.HORIZONTAL);
 
-                        File file = new File(storageDir, "foodkcal_" + timeStamp + "_" + j + ".jpg");
-                        BitmapFactory.Options op = new BitmapFactory.Options();
-                        Bitmap Bm = BitmapFactory.decodeFile(file.getAbsolutePath(), op);
-                        if (Bm != null) {
-                            final ImageView rowImageView = new ImageView(context);
-                            rowImageView.setImageBitmap(Bitmap.createScaledBitmap(Bm, 250, 250, false));
+                File file = new File(storageDir, "foodkcal_" + timeStamp + "_" + j + ".jpg");
+                BitmapFactory.Options op = new BitmapFactory.Options();
+                Bitmap Bm = BitmapFactory.decodeFile(file.getAbsolutePath(), op);
+                if (Bm != null) {
+                    final ImageView rowImageView = new ImageView(context);
+                    rowImageView.setImageBitmap(Bitmap.createScaledBitmap(Bm, 250, 250, false));
 
-                            // add the textview to the linearlayout
-                            entryLayout.addView(rowImageView);
-                        }
-
-
-                        // create a new textview
-                        final TextView rowTextView = new TextView(context);
-                        //rowTextView.append(timeStamp + "\n");
-                        file = new File(storageDir, "foodkcal_" + timeStamp + "_" + j + ".data");
-                        try{
-                            Scanner scan = new Scanner(file);
-                            while(scan.hasNextLine()){
-                                rowTextView.append(scan.nextLine());
-                            }
-                        }catch (FileNotFoundException e) {
-                            // TODO: handle exception
-                        }
-                        // add the textview to the linearlayout
-                        entryLayout.addView(rowTextView);
-
-                        layout.addView(entryLayout);
-
-                    }
-
+                    // add the textview to the linearlayout
+                    entryLayout.addView(rowImageView);
                 }
 
-            }
-        });
 
+                // create a new textview
+                final TextView rowTextView = new TextView(context);
+                //rowTextView.append(timeStamp + "\n");
+                file = new File(storageDir, "foodkcal_" + timeStamp + "_" + j + ".data");
+                try{
+                    Scanner scan = new Scanner(file);
+                    while(scan.hasNextLine()){
+                        rowTextView.append(scan.nextLine());
+                    }
+                }catch (FileNotFoundException e) {
+                    // TODO: handle exception
+                }
+                // add the textview to the linearlayout
+                entryLayout.addView(rowTextView);
+
+                layout.addView(entryLayout);
+
+            }
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super .onResume();
+        layout.removeAllViews();
+        for(int i=0; i<7; i++){
+            final Calendar cal = Calendar.getInstance();
+            cal.add(Calendar.DATE, -i);
+            Date d = cal.getTime();
+            timeStamp = new SimpleDateFormat("yyyyMMdd").format(d);
+
+            final TextView dayTextView = new TextView(context);
+            dayTextView.append(timeStamp + "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+            layout.addView(dayTextView);
+
+            int N = sp.getInt(timeStamp, 0);
+
+            for (int j = 0; j < N; j++) {
+
+                final LinearLayout entryLayout = new LinearLayout(context);
+                entryLayout.setOrientation(LinearLayout.HORIZONTAL);
+
+                File file = new File(storageDir, "foodkcal_" + timeStamp + "_" + j + ".jpg");
+                BitmapFactory.Options op = new BitmapFactory.Options();
+                Bitmap Bm = BitmapFactory.decodeFile(file.getAbsolutePath(), op);
+                if (Bm != null) {
+                    final ImageView rowImageView = new ImageView(context);
+                    rowImageView.setImageBitmap(Bitmap.createScaledBitmap(Bm, 250, 250, false));
+
+                    // add the textview to the linearlayout
+                    entryLayout.addView(rowImageView);
+                }
+
+                // create a new textview
+                final TextView rowTextView = new TextView(context);
+                //rowTextView.append(timeStamp + "\n");
+                file = new File(storageDir, "foodkcal_" + timeStamp + "_" + j + ".data");
+                try{
+                    Scanner scan = new Scanner(file);
+                    while(scan.hasNextLine()){
+                        rowTextView.append(scan.nextLine());
+                    }
+                }catch (FileNotFoundException e) {
+                    // TODO: handle exception
+                }
+                // add the textview to the linearlayout
+                entryLayout.addView(rowTextView);
+
+                layout.addView(entryLayout);
+
+            }
+        }
     }
 
 }
