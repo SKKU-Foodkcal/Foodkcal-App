@@ -4,6 +4,7 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
 import android.annotation.SuppressLint;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -40,7 +41,7 @@ public class Result extends AppCompatActivity {
     private Context context;
     private String currentPhotoPath;
     private ImageView iv_thumb;
-    private Button btn_anaylze, btn_cancel, btn_save;
+    private Button btn_cancel, btn_save;
     private TextView tv_foodName, tv_foodkcal, tv_foodFat, tv_foodCarb, tv_foodProt;
     private EditText et_amount;
 
@@ -63,7 +64,6 @@ public class Result extends AppCompatActivity {
         tv_foodProt = findViewById(R.id.textView_prot);
         iv_thumb = findViewById(R.id.imageView);
         btn_cancel = findViewById(R.id.btn_cancel);
-        btn_anaylze = findViewById(R.id.analyze);
         btn_save = findViewById(R.id.btn_save);
         et_amount = findViewById(R.id.editText_amount);
 
@@ -74,40 +74,6 @@ public class Result extends AppCompatActivity {
         storageDir = context.getFilesDir();
 
         dispatchTakePictureIntent();
-
-
-        btn_anaylze.setOnClickListener(new View.OnClickListener() {
-            @SuppressLint("StaticFieldLeak")
-            @Override
-            public void onClick(View view) {
-                File file = new File(currentPhotoPath);
-                MultipartBody.Part filePart = MultipartBody.Part.createFormData("images", file.getName(),
-                        RequestBody.create(MediaType.parse("image/*"), file));
-                TestService testService = TestService.retrofit.create(TestService.class);
-                Call<PostResponse> call = testService.postImage(filePart);
-                call.enqueue(new Callback<PostResponse>() {
-                    @Override
-                    public void onResponse(Call<PostResponse> call, Response<PostResponse> response) {
-                        String fat = response.body().getFat();
-                        String carbs = response.body().getCarbs();
-                        String food_Name = response.body().getFood_Name();
-                        String unit = response.body().getUnit();
-                        String calories = response.body().getCalories();
-                        String protein = response.body().getProtein();
-
-                        tv_foodName.setText(food_Name);
-                        tv_foodkcal.setText(calories + ' ' + unit);
-                        tv_foodCarb.setText(carbs);
-                        tv_foodFat.setText(fat);
-                        tv_foodProt.setText(protein);
-                    }
-
-                    @Override
-                    public void onFailure(Call<PostResponse> call, Throwable t) {
-                    }
-                });
-            }
-        });
 
         btn_cancel.setOnClickListener(new View.OnClickListener(){
             @Override
@@ -184,12 +150,45 @@ public class Result extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == 1 && resultCode == RESULT_OK) {
-            //Log.d(TAG, "onActivityResult: Here1111");
+
             File file = new File(currentPhotoPath);
             BitmapFactory.Options op = new BitmapFactory.Options();
             Bitmap Bm = BitmapFactory.decodeFile(file.getAbsolutePath(), op);
-            //Log.d(TAG, "onActivityResult: Here2222");
+
             iv_thumb.setImageBitmap(Bm);
+
+            final ProgressDialog mProgressDialog = new ProgressDialog(this);
+            mProgressDialog.setIndeterminate(true);
+            mProgressDialog.setMessage("Loading...");
+            mProgressDialog.show();
+
+            MultipartBody.Part filePart = MultipartBody.Part.createFormData("images", file.getName(),
+                    RequestBody.create(MediaType.parse("image/*"), file));
+            TestService testService = TestService.retrofit.create(TestService.class);
+            Call<PostResponse> call = testService.postImage(filePart);
+            call.enqueue(new Callback<PostResponse>() {
+                @Override
+                public void onResponse(Call<PostResponse> call, Response<PostResponse> response) {
+                    String fat = response.body().getFat();
+                    String carbs = response.body().getCarbs();
+                    String food_Name = response.body().getFood_Name();
+                    String unit = response.body().getUnit();
+                    String calories = response.body().getCalories();
+                    String protein = response.body().getProtein();
+
+                    tv_foodName.setText(food_Name);
+                    tv_foodkcal.setText(calories + ' ' + unit);
+                    tv_foodCarb.setText(carbs);
+                    tv_foodFat.setText(fat);
+                    tv_foodProt.setText(protein);
+
+                    mProgressDialog.dismiss();
+                }
+
+                @Override
+                public void onFailure(Call<PostResponse> call, Throwable t) {
+                }
+            });
         }
     }
 }
