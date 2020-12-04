@@ -6,6 +6,7 @@ import androidx.core.content.FileProvider;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -15,10 +16,14 @@ import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -33,13 +38,17 @@ public class Result extends AppCompatActivity {
 
     private static final String TAG = "Result";
     private Context context;
-    static final int REQUEST_TAKE_PHOTO = 1;
-    String currentPhotoPath;
-    ImageView imageview;
-    Button anaylze;
-    Button btn_cancel;
-    TextView foodName;
-    TextView kcalPerUnit;
+    private String currentPhotoPath;
+    private ImageView iv_thumb;
+    private Button btn_anaylze, btn_cancel, btn_save;
+    private TextView tv_foodName, tv_foodkcal, tv_foodFat, tv_foodCarb, tv_foodProt;
+    private EditText et_amount;
+
+    private SharedPreferences sp;
+    private SharedPreferences.Editor spe;
+    private int index;
+    private String timeStamp;
+    private File storageDir;
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
@@ -47,22 +56,27 @@ public class Result extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_result);
         context = getApplicationContext();
-
-        imageview = findViewById(R.id.imageView);
-        Log.d(TAG, "onCreate: 111");
-        dispatchTakePictureIntent();
-        Log.d(TAG, "onCreate: 222");
-
+        tv_foodName = findViewById(R.id.foodName);
+        tv_foodkcal = findViewById(R.id.kcalPerUnit);
+        tv_foodFat = findViewById(R.id.textView_fat);
+        tv_foodCarb = findViewById(R.id.textView_carb);
+        tv_foodProt = findViewById(R.id.textView_prot);
+        iv_thumb = findViewById(R.id.imageView);
         btn_cancel = findViewById(R.id.btn_cancel);
-        btn_cancel.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View view){
-                finish();
-            }
-        });
+        btn_anaylze = findViewById(R.id.analyze);
+        btn_save = findViewById(R.id.btn_save);
+        et_amount = findViewById(R.id.editText_amount);
 
-        anaylze = findViewById(R.id.analyze);
-        anaylze.setOnClickListener(new View.OnClickListener() {
+        sp = this.getSharedPreferences("MYSP", Context.MODE_MULTI_PROCESS | Context.MODE_PRIVATE);
+        spe = sp.edit();
+        timeStamp = new SimpleDateFormat("yyyyMMdd").format(new Date());
+        index = sp.getInt(timeStamp, 0);
+        storageDir = context.getFilesDir();
+
+        dispatchTakePictureIntent();
+
+
+        btn_anaylze.setOnClickListener(new View.OnClickListener() {
             @SuppressLint("StaticFieldLeak")
             @Override
             public void onClick(View view) {
@@ -81,11 +95,11 @@ public class Result extends AppCompatActivity {
                         String calories = response.body().getCalories();
                         String protein = response.body().getProtein();
 
-                        foodName = findViewById(R.id.foodName);
-                        kcalPerUnit = findViewById(R.id.kcalPerUnit);
-
-                        foodName.setText(food_Name);
-                        kcalPerUnit.setText(calories + ' ' + unit);
+                        tv_foodName.setText(food_Name);
+                        tv_foodkcal.setText(calories + ' ' + unit);
+                        tv_foodCarb.setText(carbs);
+                        tv_foodFat.setText(fat);
+                        tv_foodProt.setText(protein);
                     }
 
                     @Override
@@ -123,7 +137,40 @@ public class Result extends AppCompatActivity {
                  */
             }
         });
+
+        btn_cancel.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view){
+                finish();
+            }
+        });
+
+        btn_save.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view){
+                File file = new File(storageDir, "foodkcal_" + timeStamp + "_" + index + ".data");
+                try {
+                    BufferedWriter buf = new BufferedWriter(new FileWriter(file, true));
+                    buf.append(tv_foodName.getText() + " " +
+                            tv_foodkcal.getText() + " " +
+                            tv_foodCarb.getText() + " " +
+                            tv_foodProt.getText() + " " +
+                            tv_foodFat.getText() + " " +
+                            et_amount.getText() + "(인분)");
+                    buf.close();
+                }catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                spe.putInt(timeStamp, index + 1);
+                spe.commit();
+
+                finish();
+            }
+        });
     }
+
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     private void dispatchTakePictureIntent() {
@@ -146,7 +193,7 @@ public class Result extends AppCompatActivity {
                         "com.example.android.fileprovider",
                         photoFile);
                 takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
-                startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
+                startActivityForResult(takePictureIntent, 1);
             }
         }
     }
@@ -154,17 +201,8 @@ public class Result extends AppCompatActivity {
     @RequiresApi(api = Build.VERSION_CODES.O)
     private File createImageFile() throws IOException {
         // Create an image file name
-        String timeStamp = new SimpleDateFormat("yyyyMMdd").format(new Date());
-        String imageFileName = "JPEG_" + timeStamp + "_";
-        //File storageDir = getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
-        File storageDir = context.getFilesDir();
-        Log.d(TAG, "createImageFile: " + storageDir);
-        File image = File.createTempFile(
-                imageFileName,  /* prefix */
-                ".jpg",         /* suffix */
-                storageDir      /* directory */
-        );
-        Log.d(TAG, "createImageFile: 111");
+        String imageFileName = "foodkcal_" + timeStamp + "_" + index + ".jpg";
+        File image = new File(storageDir, imageFileName);
         // Save a file: path for use with ACTION_VIEW intents
         currentPhotoPath = image.getAbsolutePath();
         Log.d(TAG, "createImageFile: curphotopath : " + currentPhotoPath);
@@ -174,13 +212,13 @@ public class Result extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQUEST_TAKE_PHOTO && resultCode == RESULT_OK) {
+        if (requestCode == 1 && resultCode == RESULT_OK) {
             //Log.d(TAG, "onActivityResult: Here1111");
             File file = new File(currentPhotoPath);
             BitmapFactory.Options op = new BitmapFactory.Options();
             Bitmap Bm = BitmapFactory.decodeFile(file.getAbsolutePath(), op);
             //Log.d(TAG, "onActivityResult: Here2222");
-            imageview.setImageBitmap(Bm);
+            iv_thumb.setImageBitmap(Bm);
         }
     }
 }
