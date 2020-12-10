@@ -38,10 +38,7 @@ public class MainActivity extends AppCompatActivity {
 
     private ImageButton btn_cam, btn_nut, btn_list;
     private Context context;
-    private File storageDir;
-    private String timeStamp;
-    private SharedPreferences sp;
-    LinearLayout layout;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +48,18 @@ public class MainActivity extends AppCompatActivity {
         btn_cam = findViewById(R.id.button);
         btn_nut = findViewById(R.id.button3);
         btn_list = findViewById(R.id.button4);
+
+//        //최초 실행시 이 부분을 uncomment 해주세요. (과거 날짜 값들 0으로 세팅하는 코드)
+//        SharedPreferences sp = this.getSharedPreferences("MYSP", Context.MODE_MULTI_PROCESS | Context.MODE_PRIVATE);
+//        SharedPreferences.Editor spe = sp.edit();
+//        for(int i=0;i<50;i++){
+//            final Calendar cal = Calendar.getInstance();
+//            cal.add(Calendar.DATE, -i);
+//            Date d = cal.getTime();
+//            String timeStamp = new SimpleDateFormat("yyyyMMdd").format(d);
+//            spe.putInt(timeStamp, 0);
+//            spe.commit();
+//        }
 
 
         FragmentManager fm = getSupportFragmentManager();
