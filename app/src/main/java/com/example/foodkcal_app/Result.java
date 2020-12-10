@@ -157,6 +157,7 @@ public class Result extends AppCompatActivity {
 
             iv_thumb.setImageBitmap(Bm);
 
+
             final ProgressDialog mProgressDialog = new ProgressDialog(this);
             mProgressDialog.setIndeterminate(true);
             mProgressDialog.setMessage("Loading...");
@@ -179,8 +180,9 @@ public class Result extends AppCompatActivity {
                     tv_foodName.setText(food_Name);
                     tv_foodkcal.setText(calories + ' ' + unit);
                     tv_foodCarb.setText(carbs);
-                    tv_foodFat.setText(fat);
                     tv_foodProt.setText(protein);
+                    tv_foodFat.setText(fat);
+
 
                     mProgressDialog.dismiss();
                 }
@@ -189,6 +191,8 @@ public class Result extends AppCompatActivity {
                 public void onFailure(Call<PostResponse> call, Throwable t) {
                 }
             });
+
+
         }
     }
 }
